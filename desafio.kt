@@ -1,4 +1,4 @@
-class Usuario (val nome: String)
+data class Usuario(val nome: String)
 
 enum class Nivel {
     BASICO,
@@ -6,10 +6,21 @@ enum class Nivel {
     DIFICIL
 }
 
-data class ConteudoEducacional(val nome: String, val duracao: Int = 60)
+data class ConteudoEducacional(
+    val id: Int,
+    val nome: String,
+    val nivel: Nivel,
+    val duracao: Int = 30,
+    var finalizado: Boolean = false
+)
 
-data class Formacao(val nome: String, val nivel: Nivel, var conteudos: List<ConteudoEducacional>) {
-
+data class Formacao(
+    val id: Int,
+    val nome: String,
+    val nivel: Nivel,
+    var conteudos: List<ConteudoEducacional>,
+    val finalizado: Boolean = false
+) {
     val inscritos = mutableListOf<Usuario>()
 
     fun matricular(usuario: Usuario) {
@@ -24,7 +35,7 @@ data class Formacao(val nome: String, val nivel: Nivel, var conteudos: List<Cont
 
     fun listarInscritos() {
         if (inscritos.isEmpty()) {
-            println("Não há inscritos nesta formação.")
+            println("Não há inscritos na formação $nome.")
         } else {
             println("Lista de Inscritos na Formação $nome:")
             for (inscrito in inscritos) {
@@ -34,46 +45,39 @@ data class Formacao(val nome: String, val nivel: Nivel, var conteudos: List<Cont
     }
 }
 
-fun validarMatricula(usuario: Usuario, formacao: Formacao) {
-    try {
-        formacao.matricular(usuario)
-    } catch (e: IllegalArgumentException) {
-        println("Erro ao matricular: ${e.message}")
+fun validarMatricula(listaUsuarios: List<Usuario>, formacao: Formacao) {
+    for (usuario in listaUsuarios) {
+        try {
+            formacao.matricular(usuario)
+        } catch (e: IllegalArgumentException) {
+            println("Erro ao matricular: ${e.message}")
+        }
     }
 }
 
-
 fun main() {
-    val usuarioRodrigo = Usuario("Rodrigo")
-    val usuarioLeticia = Usuario("Leticia")
-    val usuarioSemNome = Usuario("")
+    val usuarios = listOf(Usuario("Rodrigo"), Usuario(""))
 
     val listaConteudoAndroid = listOf(
-        ConteudoEducacional("Conhecendo o Kotlin", 1),
-        ConteudoEducacional("Introdução a prática à linguagem Kotlin", 2),
-        ConteudoEducacional("Estruturas de controle", 2),
-        ConteudoEducacional("Orientação a Objetos", 2),
+        ConteudoEducacional(0, "Conhecendo o Kotlin", Nivel.BASICO, 5),
+        ConteudoEducacional(1, "Introdução a prática à linguagem Kotlin", Nivel.BASICO, 12),
+        ConteudoEducacional(2, "Estruturas de controle", Nivel.BASICO, 20),
     )
     val listaConteudoIOS = listOf(
-        ConteudoEducacional("Conhecendo o Swift", 1),
-        ConteudoEducacional("Introdução a prática à linguagem Swift", 2),
-        ConteudoEducacional("Estruturas de controle", 2),
-        ConteudoEducacional("Orientação a Objetos", 2),
+        ConteudoEducacional(0, "Conhecendo o Swift", Nivel.BASICO, 3),
+        ConteudoEducacional(1, "Introdução a prática à linguagem Swift", Nivel.BASICO, 10),
+        ConteudoEducacional(2, "Estruturas de controle", Nivel.BASICO, 5),
     )
 
-    val formacaoAndroid = Formacao("Fundamentos Android", Nivel.BASICO, listaConteudoAndroid)
-    val formacaoIOS = Formacao("Fundamentos IOS", Nivel.BASICO, listaConteudoIOS)
+    val formacaoAndroid = Formacao(0, "Fundamentos Android", Nivel.BASICO, listaConteudoAndroid)
+    val formacaoIOS = Formacao(1, "Fundamentos IOS", Nivel.BASICO, listaConteudoIOS)
 
     println(formacaoAndroid)
     println(formacaoIOS)
 
-    validarMatricula(usuarioRodrigo, formacaoAndroid)
-    validarMatricula(usuarioLeticia, formacaoAndroid)
-    validarMatricula(usuarioSemNome, formacaoIOS)
-    validarMatricula(usuarioRodrigo, formacaoAndroid)
+    validarMatricula(usuarios, formacaoAndroid)
+    validarMatricula(usuarios, formacaoAndroid)
 
     formacaoAndroid.listarInscritos()
     formacaoIOS.listarInscritos()
-
-
 }
